@@ -3,9 +3,10 @@ import { Controller, Get } from '@nestjs/common';
 @Controller('health')
 export class HealthController {
   @Get()
-  check() {
+  getHealth() {
     return {
-      status: 'ok',
+      ok: true,
+      service: 'orderhub-api',
       timestamp: new Date().toISOString(),
     };
   }
