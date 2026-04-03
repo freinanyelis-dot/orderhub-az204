@@ -1,16 +1,19 @@
-import { Controller, Get } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
-
-const orders: CreateOrderDto[] = [
-  { id: '1', customerId: 'C123', total: 45.6, status: 'Pending' },
-  { id: '2', customerId: 'C456', total: 89.99, status: 'Shipped' },
-  { id: '3', customerId: 'C789', total: 120.0, status: 'Delivered' },
-];
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { OrdersService } from './orders.service';
 
 @Controller('orders')
 export class OrdersController {
+  constructor(private readonly ordersService: OrdersService) {}
+
   @Get()
-  findAll(): CreateOrderDto[] {
-    return orders;
+  getOrders() {
+    return this.ordersService.findAll();
+  }
+
+  @Post()
+  createOrder(
+    @Body() body: { customerId: string; total: number; status: string },
+  ) {
+    return this.ordersService.create(body);
   }
 }
