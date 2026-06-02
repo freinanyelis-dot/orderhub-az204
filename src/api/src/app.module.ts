@@ -22,6 +22,7 @@ import { SecretsModule } from './secrets/secrets.module';
       database: process.env.DB_NAME,
       autoLoadEntities: true,
       synchronize: true,
+      ssl: process.env.DB_HOST?.includes('azure.com') ? { rejectUnauthorized: false } : false,
     }),
     OrdersModule,
     HealthModule,
