@@ -7,6 +7,8 @@ import { FilesModule } from './files/files.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SecretsModule } from './secrets/secrets.module';
+import { AuditModule } from './audit/audit.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { SecretsModule } from './secrets/secrets.module';
     AuthModule,
     UsersModule,
     SecretsModule,
+    AuditModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

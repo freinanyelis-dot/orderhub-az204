@@ -1,14 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { UsersService } from './users/users.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from './users/user.entity';
+import * as bcrypt from 'bcrypt';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
-  const usersService = app.get(UsersService);
+  const userRepo = app.get(getRepositoryToken(User));
 
-  await usersService.create('admin@orderhub.com', 'Admin123', 'admin');
+  const hashedPassword = await bcrypt.hash('Admin123', 10);
+  await userRepo.update({ email: 'admin@orderhub.com' }, { password: hashedPassword });
 
-  console.log('Seed completado');
+  console.log('Contraseña actualizada');
   await app.close();
 }
 

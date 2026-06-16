@@ -1,21 +1,40 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from './order.entity';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
+
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
+    private readonly auditService: AuditService,
   ) {}
 
   findAll(): Promise<Order[]> {
     return this.orderRepository.find();
   }
 
-  create(orderDto: Partial<Order>): Promise<Order> {
+  async create(orderDto: Partial<Order>, user?: any): Promise<Order> {
     const order = this.orderRepository.create(orderDto);
-    return this.orderRepository.save(order);
+    const savedOrder = await this.orderRepository.save(order);
+
+    this.logger.log(`Order created with id ${savedOrder.id} by ${user?.email}`);
+
+    await this.auditService.recordEvent({
+      orderId: String(savedOrder.id),
+      type: 'ORDER_CREATED',
+      userEmail: user?.email,
+      data: {
+        customerId: savedOrder.customerId,
+        total: savedOrder.total,
+        status: savedOrder.status,
+      },
+    });
+
+    return savedOrder;
   }
 }

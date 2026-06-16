@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@azure/cosmos": "^4.9.3",
     "@azure/identity": "^4.13.1",
     "@azure/keyvault-secrets": "^4.11.2",
     "@azure/storage-blob": "^12.31.0",
@@ -31,6 +32,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.6",
     "@nestjs/typeorm": "^11.0.1",
+    "applicationinsights": "^3.15.0",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "multer": "^2.1.1",

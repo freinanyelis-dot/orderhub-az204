@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import CreateOrderForm from './CreateOrderForm';
+import OrderHistory from './OrderHistory';
 
 export default function OrdersPage({ apiBaseUrl, token, user, onLogout }: { apiBaseUrl: string; token: string; user: any; onLogout: () => void }) {
   const [orders, setOrders] = useState<any[]>([]);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   const fetchOrders = async () => {
     const response = await fetch(`${apiBaseUrl}/orders`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
-    setOrders(data);
+    setOrders(Array.isArray(data) ? data : []);
   };
 
   useEffect(() => { fetchOrders(); }, []);
@@ -25,21 +27,25 @@ export default function OrdersPage({ apiBaseUrl, token, user, onLogout }: { apiB
           <button onClick={onLogout} style={{ marginLeft: '10px' }}>Cerrar sesión</button>
         </div>
       </header>
-
       <h2>Órdenes</h2>
       {orders.length === 0 ? (
         <p>No hay órdenes aún.</p>
       ) : (
         <ul>
           {orders.map((order: any) => (
-            <li key={order.id}>#{order.id} - {order.customerId} - ${order.total} - {order.status}</li>
+            <li
+              key={order.id}
+              onClick={() => setSelectedOrderId(String(order.id))}
+              style={{ cursor: 'pointer', fontWeight: selectedOrderId === String(order.id) ? 'bold' : 'normal' }}>
+              #{order.id} - {order.customerId} - ${order.total} - {order.status}
+            </li>
           ))}
         </ul>
       )}
-
       {canCreateOrders && (
         <CreateOrderForm apiBaseUrl={apiBaseUrl} token={token} onOrderCreated={fetchOrders} />
       )}
+      <OrderHistory apiBaseUrl={apiBaseUrl} token={token} selectedOrderId={selectedOrderId} />
     </div>
   );
 }

@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { BlobServiceClient } from '@azure/storage-blob';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class FilesService {
-  async uploadFile(file: Express.Multer.File, orderId?: string) {
+  constructor(private readonly auditService: AuditService) {}
+
+  async uploadFile(file: Express.Multer.File, orderId?: string, user?: any) {
     const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING!;
     const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'attachments';
 
@@ -16,6 +19,18 @@ export class FilesService {
 
     await blockBlobClient.uploadData(file.buffer, {
       blobHTTPHeaders: { blobContentType: file.mimetype },
+    });
+
+    await this.auditService.recordEvent({
+      orderId: safeOrderId,
+      type: 'FILE_UPLOADED',
+      userEmail: user?.email,
+      data: {
+        fileName: file.originalname,
+        blobName,
+        contentType: file.mimetype,
+        size: file.size,
+      },
     });
 
     return {
