@@ -4,13 +4,26 @@ import OrdersPage from './OrdersPage';
 
 function App() {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  
+  const getStoredToken = () => {
+    const t = localStorage.getItem('token');
+    if (!t || t.startsWith('{')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return null;
+    }
+    return t;
+  };
+
+  const [token, setToken] = useState(getStoredToken);
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
   const handleLogin = (accessToken: string, userData: any) => {
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('user', JSON.stringify(userData));
     setToken(accessToken);
     setUser(userData);
   };
