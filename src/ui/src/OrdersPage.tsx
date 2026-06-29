@@ -10,6 +10,10 @@ export default function OrdersPage({ apiBaseUrl, token, user, onLogout }: { apiB
     const response = await fetch(`${apiBaseUrl}/orders`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (response.status === 401) {
+      onLogout();
+      return;
+    }
     const data = await response.json();
     setOrders(Array.isArray(data) ? data : []);
   };
